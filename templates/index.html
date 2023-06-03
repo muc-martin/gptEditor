@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LaTeX Editor</title>
+    <style>
+        body {
+            background-color: #333;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+        }
+        .left-side {
+            padding: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .right-side {
+            flex: 2;
+        }
+        textarea {
+            width: 100%;
+            height: 50px;
+            background-color: #444;
+            color: white;
+            border: 1px solid #555;
+            margin-bottom: 10px;
+            transition: height 0.3s ease;
+        }
+        textarea:focus {
+            height: 200px;
+        }
+        button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #666;
+        }
+        iframe {
+            width: 100%;
+            height: 100vh;
+            border: none;
+        }
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: green;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="left-side">
+        <div class="button-container">
+            <button id="review-button">Send Input 1 to GPT4</button>
+            <button id="compare-button">Compare Input 1 and Input 2</button>
+        </div>
+        <div class="prompt-pane">
+            <label for="system-text">Prompt</label>
+            <textarea id="system-text" placeholder="Paste your System Prompt here">You are a chatbot reviewing a document for grammar, spelling, clarity, formatting, and style. Your task is to correct any errors without adding new information. Output the revised text in LaTeX format, including appropriate environments for lists. Your review aims to improve the document's writing quality, clarity, formatting and style consistency.</textarea>
+        </div>
+        <div class="input-pane">
+            <label for="input-text">Input 1</label>
+            <textarea id="input-text" placeholder="Paste your LaTeX code here"></textarea>
+        </div>
+        <div class="compare-pane">
+            <label for="compare-text">Input 2</label>
+            <textarea id="compare-text" placeholder="Paste your text to compare here"></textarea>
+        </div>
+        <div class="output-pane">
+            <label for="output-text">Reviewed</label>
+            <textarea id="output-text" readonly placeholder="Reviewed and edited LaTeX code will appear here"></textarea>
+        </div>
+    </div>
+    <div class="right-side">
+        <iframe id="latex-diff-viewer"></iframe>
+    </div>
+    <script>
+        $("#review-button").click(function() {
+            const inputText = $("#input-text").val();
+            const systemText = $("#system-text").val();
+            $.post("/api/review", {input: inputText, prompt: systemText}, function(data) {
+                $("#output-text").val(data.edited_text);
+                $("#latex-diff-viewer").attr("src", "/api/render_latex_diff");
+            });
+        });
+
+        $("#compare-button").click(function() {
+            const inputText = $("#input-text").val();
+            const compareText = $("#compare-text").val();
+            $.post("/api/compare", {input: inputText, compare: compareText}, function(data) {
+                if (data.success) {
+                    $("#latex-diff-viewer").attr("src", "/api/render_latex_diff");
+                }
+            });
+        });
+
+        // Function to update the status message
+    </script>
+</body>
+</html>
