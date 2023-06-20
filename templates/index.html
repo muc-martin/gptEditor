@@ -71,6 +71,7 @@
         <div class="button-container">
             <button id="review-button">Send Input 1 to GPT4</button>
             <button id="compare-button">Compare Input 1 and Input 2</button>
+            <button id="strip-button">Strip latex comments</button>
         </div>
         <div class="prompt-pane">
             <label for="system-text">Prompt</label>
@@ -109,6 +110,13 @@
                 if (data.success) {
                     $("#latex-diff-viewer").attr("src", "/api/render_latex_diff");
                 }
+            });
+        });
+
+        $("#strip-button").click(function() {
+            const inputText = $("#input-text").val();
+            $.post("/api/strip", {input: inputText}, function(data) {
+                $("#output-text").val(data.edited_text);
             });
         });
 

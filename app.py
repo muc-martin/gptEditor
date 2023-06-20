@@ -101,6 +101,13 @@ def compare_latex():
 
     return jsonify({"success": True})
 
+@app.route('/api/strip', methods=['POST'])
+def strip_latex():
+    input_text = request.form.get("input")
+    processed_text = remove_unwanted_latex(input_text)
+
+    return jsonify({"edited_text": processed_text})
+
 @app.route('/api/render_latex_diff')
 def send_diff_pdf():
     return send_file(os.path.join(temp_dir, "diff.pdf"), mimetype="application/pdf")
